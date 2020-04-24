@@ -17,9 +17,10 @@ depparser = stanza.Pipeline("en", processors="tokenize,mwt,pos,lemma,depparse", 
 test = depparser(bernie_tweets[0])
 
 #====================Candidate Word Association=======================
-# SCRATCH THAT JUST USE A PRETRAINED OPINION UNIT EXTRACTION MODEL 
 # 1) Demarcate tweets by whether they only mention Bernie, Biden, or both
 # 2) If just one, then we can take all the subtrees of pronouns
+# 2a) Compute word dependency distances and gather all the words surrounding the aspect word (Biden/Bernie)
+# 3) If both are mentioned, then will need to figure out way to allocate words 
 #Collect all words/ids related to "Bernie" and "Biden"; no overlap!
 bernie_words_sent = []
 biden_words_sent = []

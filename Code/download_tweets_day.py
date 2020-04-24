@@ -45,5 +45,20 @@ def bernieSearch(date):
     twint.run.Search(c) #Search for bernie data
     return True
 
+def trumpSearch(date):
+    c = twint.Config()
+    c.Search = "trump OR @realDonaldTrump -filter:replies"
+    c.Lang = "en"
+    c.Store_csv = True
+    c.Output = path + "/Donald/trump_tweets_{}.csv".format(date)
+    c.Since = date
+    c.Until = date
+    c.Debug = True
+    c.Update = True
+    c.Hide_output = True
+    c.Limit = 10000
+    c.Custom["tweet"] = ["date","username","tweet","likes_count", "retweets_count"]
+    twint.run.Search(c) #Search for bernie data
+    return True
+
 if __name__ == "__main__":
-    

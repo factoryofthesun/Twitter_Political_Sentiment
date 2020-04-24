@@ -15,7 +15,7 @@ path = str(Path(__file__).parent / "../Data")
 def bidenSearch():
     completed_dates = []
     #Skip completed dates
-    with open("biden_finished_dates.txt", 'r') as f:
+    with open(path + "/DiamondJoe/biden_finished_dates.txt", 'r') as f:
         lines = f.readlines()
         dates_to_skip = [line.rstrip() for line in lines]
     f.close()
@@ -39,7 +39,7 @@ def bidenSearch():
         c.Custom["tweet"] = ["date","username","tweet","likes_count", "retweets_count"]
         twint.run.Search(c) #Search for biden data
         completed_dates.append(date_string)
-    with open("biden_finished_dates.txt", 'a+') as f:
+    with open(path + "/DiamondJoe/biden_finished_dates.txt", 'a+') as f:
         for d in completed_dates:
             f.write("{}\n".format(d))
     f.close()
@@ -60,7 +60,7 @@ while not ret:
 def bernieSearch():
     completed_dates = []
     #Skip completed dates
-    with open("biden_finished_dates.txt", 'r') as f:
+    with open(path + "/Bernard/bernie_finished_dates.txt", 'r') as f:
         lines = f.readlines()
         dates_to_skip = [line.rstrip() for line in lines]
     f.close()
@@ -83,11 +83,43 @@ def bernieSearch():
         c.Limit = 10000
         c.Custom["tweet"] = ["date","username","tweet","likes_count", "retweets_count"]
         twint.run.Search(c) #Search for biden data
-    with open("bernie_finished_dates.txt", 'a+') as f:
+    with open(path + "/Bernard/bernie_finished_dates.txt", 'a+') as f:
         for d in completed_dates:
             f.write("{}\n".format(d))
     f.close()
     return True
 
-bernieSearch()
+def trumpSearch():
+    completed_dates = []
+    #Skip completed dates
+    with open(path + "/Donald/trump_finished_dates.txt", 'r') as f:
+        lines = f.readlines()
+        dates_to_skip = [line.rstrip() for line in lines]
+    f.close()
+    today = date.today()
+    start_date = date(2020,1,1)
+    delta_days = today - start_date
+    for i in range(delta_days.days+1):
+        search_date = start_date + timedelta(days = i)
+        date_string = search_date.strftime("%Y-%m-%d")
+        c = twint.Config()
+        c.Search = "trump OR @realDonaldTrump -filter:replies"
+        c.Lang = "en"
+        c.Store_csv = True
+        c.Output = path + "/Donald/trump_tweets_{}.csv".format(date_string)
+        c.Since = date_string
+        c.Debug = True
+        c.Update = True
+        c.Resume = "twint-request_urls.log"
+        c.Hide_output = True
+        c.Limit = 10000
+        c.Custom["tweet"] = ["date","username","tweet","likes_count", "retweets_count"]
+        twint.run.Search(c) #Search for biden data
+    with open(path + "/Donald/trump_finished_dates.txt", 'a+') as f:
+        for d in completed_dates:
+            f.write("{}\n".format(d))
+    f.close()
+    return True
+
+trumpSearch()
 bidenSearch()
