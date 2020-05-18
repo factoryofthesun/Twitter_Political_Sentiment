@@ -5,40 +5,56 @@
 
 import twint
 import time
+import os 
 from datetime import date, timedelta
 from pathlib import Path
+from time import sleep
 
 path = str(Path(__file__).parent / "../Data")
 
 #Initial Configuration - Basic Keyword Search, Tweet engagement values
 #Get 10000 tweets per day
 def bidenSearch():
+    c = twint.Config()
+    c.Search = "(biden OR @JoeBiden) -RT -filter:replies"
+    c.Lang = "en"
+    c.Store_csv = True
+    c.Debug = True
+    c.Update = True
+    c.Resume = "biden_resume.log"
+    c.Hide_output = True
+    c.Limit = 10000
+    c.Custom["tweet"] = ["id","date","username","tweet","likes_count", "retweets_count"]
     completed_dates = []
-    #Skip completed dates
-    with open(path + "/DiamondJoe/biden_finished_dates.txt", 'r') as f:
-        lines = f.readlines()
-        dates_to_skip = [line.rstrip() for line in lines]
-    f.close()
+    try:
+        with open(path + "/DiamondJoe/biden_finished_dates.txt", 'r') as f:
+            lines = f.readlines()
+            dates_to_skip = [line.rstrip() for line in lines]
+        f.close()
+    except:
+        dates_to_skip = []
     today = date.today()
-    start_date = date(2020,1,1)
+    start_date = date(2020,4,8) # RIP Bernard
     delta_days = today - start_date
     for i in range(delta_days.days + 1):
+        searched = 0
         search_date = start_date + timedelta(days = i)
         date_string = search_date.strftime("%Y-%m-%d")
-        c = twint.Config()
-        c.Search = "biden OR @JoeBiden -filter:replies"
-        c.Lang = "en"
-        c.Store_csv = True
-        c.Output = path + "/DiamondJoe/biden_tweets_{}.csv".format(date_string)
+        if date_string in dates_to_skip:
+            continue #Skip completed dates
         c.Since = date_string
-        c.Debug = True
-        c.Update = True
-        c.Resume = "twint-request_urls.log"
-        c.Hide_output = True
-        c.Limit = 10000
-        c.Custom["tweet"] = ["date","username","tweet","likes_count", "retweets_count"]
-        twint.run.Search(c) #Search for biden data
+        search_date_until = start_date + timedelta(days = i+1)
+        c.Until = search_date_until.strftime("%Y-%m-%d")
+        c.Output = path + "/DiamondJoe/biden_tweets_{}.csv".format(date_string)
+        while searched < 1:
+            try:
+                twint.run.Search(c) #Search for biden data
+                searched += 1
+            except Exception as e:
+                print(e, "Sleeping for 420 seconds...")
+                sleep(420)
         completed_dates.append(date_string)
+        os.remove("biden_resume.log")
     with open(path + "/DiamondJoe/biden_finished_dates.txt", 'a+') as f:
         for d in completed_dates:
             f.write("{}\n".format(d))
@@ -58,31 +74,47 @@ while not ret:
 
 
 def bernieSearch():
+    c = twint.Config()
+    c.Search = "(bernie OR @BernieSanders) -RT -filter:replies"
+    c.Lang = "en"
+    c.Store_csv = True
+    c.Debug = True
+    c.Update = True
+    c.Resume = "bernie_resume.log"
+    c.Hide_output = True
+    c.Limit = 10000
+    c.Custom["tweet"] = ["id","date","username","tweet","likes_count", "retweets_count"]
     completed_dates = []
     #Skip completed dates
-    with open(path + "/Bernard/bernie_finished_dates.txt", 'r') as f:
-        lines = f.readlines()
-        dates_to_skip = [line.rstrip() for line in lines]
-    f.close()
+    try:
+        with open(path + "/Bernard/bernie_finished_dates.txt", 'r') as f:
+            lines = f.readlines()
+            dates_to_skip = [line.rstrip() for line in lines]
+        f.close()
+    except:
+        dates_to_skip = []
     today = date.today()
     start_date = date(2020,1,1)
     delta_days = today - start_date
-    for i in range(delta_days.days+1):
+    for i in range(delta_days.days + 1):
+        searched = 0
         search_date = start_date + timedelta(days = i)
         date_string = search_date.strftime("%Y-%m-%d")
-        c = twint.Config()
-        c.Search = "bernie OR @BernieSanders -filter:replies"
-        c.Lang = "en"
-        c.Store_csv = True
-        c.Output = path + "/Bernard/bernie_tweets_{}.csv".format(date_string)
+        if date_string in dates_to_skip:
+            continue #Skip completed dates
         c.Since = date_string
-        c.Debug = True
-        c.Update = True
-        c.Resume = "twint-request_urls.log"
-        c.Hide_output = True
-        c.Limit = 10000
-        c.Custom["tweet"] = ["date","username","tweet","likes_count", "retweets_count"]
-        twint.run.Search(c) #Search for biden data
+        search_date_until = start_date + timedelta(days = i+1)
+        c.Until = search_date_until.strftime("%Y-%m-%d")
+        c.Output = path + "/Bernard/bernie_tweets_{}.csv".format(date_string)
+        while searched < 1:
+            try:
+                twint.run.Search(c)
+                searched += 1
+            except Exception as e:
+                print(e, "Sleeping for 420 seconds...")
+                sleep(420)
+        completed_dates.append(date_string)
+        os.remove("bernie_resume.log")
     with open(path + "/Bernard/bernie_finished_dates.txt", 'a+') as f:
         for d in completed_dates:
             f.write("{}\n".format(d))
@@ -90,31 +122,47 @@ def bernieSearch():
     return True
 
 def trumpSearch():
+    c = twint.Config()
+    c.Search = "(trump OR @realDonaldTrump) -RT -filter:replies"
+    c.Lang = "en"
+    c.Store_csv = True
+    c.Debug = True
+    c.Update = True
+    c.Resume = "trump_resume.log"
+    c.Hide_output = True
+    c.Limit = 10000
+    c.Custom["tweet"] = ["id","date","username","tweet","likes_count", "retweets_count"]
     completed_dates = []
     #Skip completed dates
-    with open(path + "/Donald/trump_finished_dates.txt", 'r') as f:
-        lines = f.readlines()
-        dates_to_skip = [line.rstrip() for line in lines]
-    f.close()
+    try:
+        with open(path + "/Donald/trump_finished_dates.txt", 'r') as f:
+            lines = f.readlines()
+            dates_to_skip = [line.rstrip() for line in lines]
+        f.close()
+    except:
+        dates_to_skip = []
     today = date.today()
-    start_date = date(2020,1,1)
+    start_date = date(2020,4,8) # RIP Bernard
     delta_days = today - start_date
-    for i in range(delta_days.days+1):
+    for i in range(delta_days.days + 1):
+        searched = 0
         search_date = start_date + timedelta(days = i)
         date_string = search_date.strftime("%Y-%m-%d")
-        c = twint.Config()
-        c.Search = "trump OR @realDonaldTrump -filter:replies"
-        c.Lang = "en"
-        c.Store_csv = True
-        c.Output = path + "/Donald/trump_tweets_{}.csv".format(date_string)
+        if date_string in dates_to_skip:
+            continue #Skip completed dates
         c.Since = date_string
-        c.Debug = True
-        c.Update = True
-        c.Resume = "twint-request_urls.log"
-        c.Hide_output = True
-        c.Limit = 10000
-        c.Custom["tweet"] = ["date","username","tweet","likes_count", "retweets_count"]
-        twint.run.Search(c) #Search for biden data
+        search_date_until = start_date + timedelta(days = i+1)
+        c.Until = search_date_until.strftime("%Y-%m-%d")
+        c.Output = path + "/Donald/trump_tweets_{}.csv".format(date_string)
+        while searched < 1:
+            try:
+                twint.run.Search(c)
+                searched += 1
+            except Exception as e:
+                print(e, "Sleeping for 420 seconds...")
+                sleep(420)
+        completed_dates.append(date_string)
+        os.remove("trump_resume.log")
     with open(path + "/Donald/trump_finished_dates.txt", 'a+') as f:
         for d in completed_dates:
             f.write("{}\n".format(d))

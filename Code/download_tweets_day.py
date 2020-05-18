@@ -25,7 +25,7 @@ def bidenSearch(date):
     c.Until = date
     c.Hide_output = True
     c.Limit = 10000
-    c.Custom["tweet"] = ["date","username","tweet","likes_count", "retweets_count"]
+    c.Custom["tweet"] = ["id","date","username","tweet","likes_count", "retweets_count"]
     twint.run.Search(c) #Search for biden data
     return True
 
@@ -41,7 +41,7 @@ def bernieSearch(date):
     c.Update = True
     c.Hide_output = True
     c.Limit = 10000
-    c.Custom["tweet"] = ["date","username","tweet","likes_count", "retweets_count"]
+    c.Custom["tweet"] = ["id","date","username","tweet","likes_count", "retweets_count"]
     twint.run.Search(c) #Search for bernie data
     return True
 
@@ -57,7 +57,7 @@ def trumpSearch(date):
     c.Update = True
     c.Hide_output = True
     c.Limit = 10000
-    c.Custom["tweet"] = ["date","username","tweet","likes_count", "retweets_count"]
+    c.Custom["tweet"] = ["id","date","username","tweet","likes_count", "retweets_count"]
     twint.run.Search(c) #Search for bernie data
     return True
 
