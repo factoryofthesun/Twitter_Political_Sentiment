@@ -5,6 +5,9 @@ import numpy as np
 import time
 from pathlib import Path
 from data_prep import process_data
+import os
+import glob
+import re
 
 # Input: date string ("YYYY-MM-DD")
 # Returns: biden/trump sentiment classified dataframes
@@ -12,9 +15,17 @@ def classifyDate(date):
     #====================Entity-Level Sentiment Analysis=======================
     # 1) Select tweets by whether they only mention Trump, Biden, or both
     # 2) For single-entity tweets, "mask" the target entity and use the pre-trained model to classify sentiment
-    # 3) For dual-entity tweets, run sentiment classifier over each tweet twice, masking Biden then Trump
-    #   a) Eyeball the results to see if they're reasonable
-    #   b) Consider using dependency parsing to capture pronoun references as well
+    #   - processData: generates auxiliary sentences per tweet
+    path = str(Path(__file__).parent / "../Data")
+    trump_sentiment_path = str(Path(__file__).parent / "../Outputs/Sentiment_Tagged/Trump")
+    biden_sentiment_path = str(Path(__file__).parent / "../Outputs/Sentiment_Tagged/Biden")
+
+    # If the classified file for the date already exists, then just read that file and return it
+    if os.path.exists(f"{trump_sentiment_path}/trump_{date}_sentiment.csv") and os.path.exists(f"{biden_sentiment_path}/biden_{date}_sentiment.csv"):
+        print(f"Sentiment classified file already exists for {date}!")
+        trump_out = pd.read_csv(f"{trump_sentiment_path}/trump_{date}_sentiment.csv")
+        biden_out = pd.read_csv(f"{biden_sentiment_path}/biden_{date}_sentiment.csv")
+        return biden_out, trump_out
 
     # If there's a GPU available...
     if torch.cuda.is_available():
@@ -31,17 +42,18 @@ def classifyDate(date):
         print('No GPU available, using the CPU instead.')
         device = torch.device("cpu")
 
-    path = str(Path(__file__).parent / "../Data")
-
-    #date = "2020-04-22"
     trump_tweets_df = pd.read_csv(path + f"/Donald/trump_tweets_{date}.csv")
     biden_tweets_df = pd.read_csv(path + f"/DiamondJoe/biden_tweets_{date}.csv")
 
     trump_tweets = trump_tweets_df['tweet']
     trump_ids = trump_tweets_df['id']
+    trump_likes = trump_tweets_df['likes_count']
+    trump_rt = trump_tweets_df['retweets_count']
 
     biden_tweets = biden_tweets_df['tweet']
     biden_ids = biden_tweets_df['id']
+    biden_likes = biden_tweets_df['likes_count']
+    biden_rt = biden_tweets_df['retweets_count']
 
     # Preprocess
     trump_aux_df = process_data(trump_tweets_df['tweet'], ['donald', 'trump'])
@@ -52,6 +64,10 @@ def classifyDate(date):
 
     biden_s1 = biden_aux_df['tweet'].tolist()
     biden_s2 = biden_aux_df['aux'].tolist()
+
+    # Remove all links from text
+    trump_s1 = [re.sub(r'https?:\/\/.*[\r\n\s]*', '', tweet, flags=re.MULTILINE) for tweet in trump_s1]
+    biden_s1 = [re.sub(r'https?:\/\/.*[\r\n\s]*', '', tweet, flags=re.MULTILINE) for tweet in biden_s1]
 
     # Tokenize
     from transformers import BertTokenizer
@@ -68,6 +84,10 @@ def classifyDate(date):
         maxlen = max(maxlen, len(input_ids))
 
     print("Maximum encoded sequence length:", maxlen)
+
+    if maxlen > 512:
+        print("Encoded tweet found that's over max length of 512! Please check for links.")
+        maxlen = 512
 
     # Full encoding
     trump_input_ids = []
@@ -169,9 +189,8 @@ def classifyDate(date):
             tmp = []
 
     biden_out = pd.DataFrame({'ID': biden_ids, "Date":date, "Tweet":biden_tweets, "Prob_Neg":prob_neg, "Prob_Neutral":prob_neutral,
-                            "Prob_Positive":prob_positive, "Prediction":preds})
+                            "Prob_Positive":prob_positive, "Prediction":preds, "Likes": biden_likes, 'Retweets':biden_rt})
 
-    biden_sentiment_path = str(Path(__file__).parent / "../Outputs/Sentiment_Tagged/Biden")
     biden_out.to_csv(biden_sentiment_path + f"/biden_{date}_sentiment.csv", index=False)
 
     avg_biden_sent = (biden_out["Prob_Neg"] * -1 + biden_out['Prob_Positive']).mean()
@@ -193,9 +212,9 @@ def classifyDate(date):
             tmp = []
 
     trump_out = pd.DataFrame({"ID": trump_ids, "Date":date, "Tweet":trump_tweets, "Prob_Neg":prob_neg, "Prob_Neutral":prob_neutral,
-                            "Prob_Positive":prob_positive, "Prediction":preds})
+                            "Prob_Positive":prob_positive, "Prediction":preds, "Likes":trump_likes, "Retweets":trump_rt})
 
-    trump_sentiment_path = str(Path(__file__).parent / "../Outputs/Sentiment_Tagged/Trump")
+
     trump_out.to_csv(trump_sentiment_path + f"/trump_{date}_sentiment.csv", index=False)
 
     avg_trump_sent = (trump_out["Prob_Neg"] * -1 + trump_out['Prob_Positive']).mean()
@@ -271,5 +290,22 @@ print(bernie_tweets[0])
 print(bernie_words_sent)
 print(biden_words_sent)'''
 
-if __name__ == "main":
-    # Apply sentiment for all the existing date files 
+if __name__ == "__main__":
+    # Apply sentiment for all the existing date files
+    datapath =  str(Path(__file__).parent / "../Data")
+
+    # Biden
+    for fpath in glob.iglob(f"{datapath}/DiamondJoe/*.csv"):
+        match = re.search('biden_tweets_(.*).csv', fpath)
+        if match:
+            classifyDate(match.group(1))
+        else:
+            raise Exception(f"{fpath} does not contain the proper naming convention!")
+
+    # Trump
+    for fpath in glob.iglob(f"{datapath}/Donald/*.csv"):
+        match = re.search('trump_tweets_(.*).csv', fpath)
+        if match:
+            classifyDate(match.group(1))
+    else:
+        raise Exception(f"{fpath} does not contain the proper naming convention!")
