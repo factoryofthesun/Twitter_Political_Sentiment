@@ -15,8 +15,8 @@ from time import sleep
 def bidenSearch(date):
     path = str(Path(__file__).parent / "../Data")
     d = datetime.strptime(date, "%Y-%m-%d")
-    yesterday = d - timedelta(days = 1)
-    yesterday_str = yesterday.strftime("%Y-%m-%d")
+    tmrw = d + timedelta(days = 1)
+    tmrw_str = tmrw.strftime("%Y-%m-%d")
 
     c = twint.Config()
     c.Search = "biden OR @JoeBiden -filter:replies"
@@ -24,8 +24,8 @@ def bidenSearch(date):
     c.Filter_retweets = True
     c.Store_csv = True
     c.Output = path + "/DiamondJoe/biden_tweets_{}.csv".format(date)
-    c.Since = yesterday_str
-    c.Until = date
+    c.Since = date
+    c.Until = tmrw_str
     c.Debug = False
     c.Update = True
     c.Resume = "D:/Code Projects/Twitter sentiment/Code/biden_resume.log"
@@ -48,16 +48,16 @@ def bidenSearch(date):
 def bernieSearch(date):
     path = str(Path(__file__).parent / "../Data")
     d = datetime.strptime(date, "%Y-%m-%d")
-    yesterday = d - timedelta(days = 1)
-    yesterday_str = yesterday.strftime("%Y-%m-%d")
+    tmrw = d + timedelta(days = 1)
+    tmrw_str = tmrw.strftime("%Y-%m-%d")
 
     c = twint.Config()
     c.Search = "bernie OR @BernieSanders -filter:replies -RT"
     c.Lang = "en"
     c.Store_csv = True
     c.Output = path + "/Bernard/bernie_tweets_{}.csv".format(date)
-    c.Since = yesterday_str
-    c.Until = date
+    c.Since = date
+    c.Until = tmrw_str
     c.Debug = False
     c.Resume = "D:/Code Projects/Twitter sentiment/Code/bernie_resume.log"
     c.Update = True
@@ -77,8 +77,8 @@ def bernieSearch(date):
 def trumpSearch(date):
     path = str(Path(__file__).parent / "../Data")
     d = datetime.strptime(date, "%Y-%m-%d")
-    yesterday = d - timedelta(days = 1)
-    yesterday_str = yesterday.strftime("%Y-%m-%d")
+    tmrw = d + timedelta(days = 1)
+    tmrw_str = tmrw.strftime("%Y-%m-%d")
 
     c = twint.Config()
     c.Search = "trump OR @realDonaldTrump -filter:replies"
@@ -86,8 +86,8 @@ def trumpSearch(date):
     c.Store_csv = True
     c.Filter_retweets = True
     c.Output = path + "/Donald/trump_tweets_{}.csv".format(date)
-    c.Since = yesterday_str
-    c.Until = date
+    c.Since = date
+    c.Until = tmrw_str
     c.Debug = False
     c.Resume = "D:/Code Projects/Twitter sentiment/Code/trump_resume.log"
     c.Update = True

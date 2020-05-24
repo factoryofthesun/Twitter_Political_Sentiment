@@ -1,6 +1,5 @@
 '''
 Main program to run daily for sentiment analysis and plot generation
-TODO: Make this a twitter bot
 '''
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -27,12 +26,12 @@ def analyzeDay(date):
     trump_score = (trump_sent_df['Prediction'] * (trump_sent_df['Likes'] + trump_sent_df['Retweets'])).sum()/(trump_sent_df['Likes'] + trump_sent_df['Retweets']).sum()
 
     date_strp = dt.strptime(date, '%Y-%m-%d')
+    date_strp = date_strp.date()
     scores_to_add = pd.Series({'Biden_Score': biden_score, 'Trump_Score': trump_score}, name = date_strp)
 
     outpath = str(Path(__file__).parent / "../Outputs")
     if os.path.exists(outpath + "/sentiment_records.csv"):
         records = pd.read_csv(outpath + "/sentiment_records.csv", index_col="Date")
-
     else:
         records = pd.DataFrame(columns = ["Date", "Biden_Score", "Trump_Score"])
         records = records.set_index("Date")
@@ -47,8 +46,8 @@ def analyzeDay(date):
     records.index = pd.to_datetime(records.index)
 
     fig, ax = plt.subplots()
-    plt.plot_date(x = records.index, y = records['Trump_Score'], fmt = 'o--r', xdate = True)
-    plt.plot_date(x = records.index, y = records['Biden_Score'], fmt = 'o--b', xdate = True)
+    plt.plot_date(x = records.index, y = records['Trump_Score'], fmt = 'o--r', markersize=5, xdate = True)
+    plt.plot_date(x = records.index, y = records['Biden_Score'], fmt = 'o--b', markersize=5, xdate = True)
 
     # Format date tick marks - Month for major tick, week for minor ticks
     months = mdates.MonthLocator()
@@ -70,7 +69,7 @@ def analyzeDay(date):
     plt.title("Daily Twitter Sentiment of Biden vs Trump")
     plt.gcf().autofmt_xdate(rotation=25)
     plt.savefig(f"{plotpath}/{date}_sentiment_plot.png")
-
+    plt.close()
     return biden_score, trump_score
 if __name__ == "__main__":
     # Read the date from arguments

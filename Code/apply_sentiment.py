@@ -119,7 +119,7 @@ def classifyDate(date):
                                                           num_labels = 2,
                                                           output_attentions=False,
                                                           output_hidden_states=False)
-    model.load_state_dict(torch.load("ML/Models/BERT_aux0.pt"))
+    model.load_state_dict(torch.load("D:/Code Projects/Twitter sentiment/Code/ML/Models/BERT_aux0.pt"))
     model.cuda()
     model.eval()
 
@@ -194,7 +194,6 @@ def classifyDate(date):
     biden_out.to_csv(biden_sentiment_path + f"/biden_{date}_sentiment.csv", index=False)
 
     avg_biden_sent = (biden_out["Prob_Neg"] * -1 + biden_out['Prob_Positive']).mean()
-    print(f"Average biden sentiment on {date}:", avg_biden_sent)
 
     tmp = []
     preds = []
@@ -218,7 +217,6 @@ def classifyDate(date):
     trump_out.to_csv(trump_sentiment_path + f"/trump_{date}_sentiment.csv", index=False)
 
     avg_trump_sent = (trump_out["Prob_Neg"] * -1 + trump_out['Prob_Positive']).mean()
-    print(f"Average trump sentiment on {date}:", avg_trump_sent)
 
     return biden_out, trump_out
 
@@ -307,5 +305,5 @@ if __name__ == "__main__":
         match = re.search('trump_tweets_(.*).csv', fpath)
         if match:
             classifyDate(match.group(1))
-    else:
-        raise Exception(f"{fpath} does not contain the proper naming convention!")
+        else:
+            raise Exception(f"{fpath} does not contain the proper naming convention!")

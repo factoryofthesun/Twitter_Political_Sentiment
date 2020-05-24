@@ -13,16 +13,15 @@ from download_tweets_day import bidenSearch, trumpSearch
 from run_analysis import analyzeDay
 from posting import makePost
 
-today = date.today()
-day_str = today.strftime("%Y-%m-%d")
-bidenSearch(day_str)
-trumpSearch(day_str)
-biden_score, trump_score = analyzeDay(day_str)
-
 # Technically, we are analyzing yesterday's tweets
-d = datetime.strptime(date, "%Y-%m-%d")
-yesterday = d - timedelta(days = 1)
+yesterday = date.today() - timedelta(days = 1)
 yesterday_str = yesterday.strftime("%Y-%m-%d")
-msg = f"Sentiment analysis for {yesterday_str} (-1 to 1):\nBiden score: {biden_score}\nTrump score: {trump_score}"
+
+bidenSearch(yesterday_str)
+trumpSearch(yesterday_str)
+biden_score, trump_score = analyzeDay(yesterday_str)
+
+msg = f"Twitter sentiment analysis for {yesterday_str}\nBiden score: {biden_score}\nTrump score: {trump_score}"
+
 # Make post
-makePost(biden_score, trump_score, msg, day_str)
+makePost(biden_score, trump_score, msg, yesterday_str)

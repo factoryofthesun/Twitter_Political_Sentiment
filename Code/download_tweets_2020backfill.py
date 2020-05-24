@@ -5,7 +5,7 @@
 
 import twint
 import time
-import os 
+import os
 from datetime import date, timedelta
 from pathlib import Path
 from time import sleep
@@ -36,15 +36,16 @@ def bidenSearch():
     today = date.today()
     start_date = date(2020,4,8) # RIP Bernard
     delta_days = today - start_date
-    for i in range(delta_days.days + 1):
+    for i in range(delta_days.days):
         searched = 0
         search_date = start_date + timedelta(days = i)
         date_string = search_date.strftime("%Y-%m-%d")
+        search_date_until = start_date + timedelta(days = i+1)
+        search_date_until_string = search_date_until.strftime("%Y-%m-%d")
         if date_string in dates_to_skip:
             continue #Skip completed dates
         c.Since = date_string
-        search_date_until = start_date + timedelta(days = i+1)
-        c.Until = search_date_until.strftime("%Y-%m-%d")
+        c.Until = search_date_until_string
         c.Output = path + "/DiamondJoe/biden_tweets_{}.csv".format(date_string)
         while searched < 1:
             try:
@@ -96,15 +97,16 @@ def bernieSearch():
     today = date.today()
     start_date = date(2020,1,1)
     delta_days = today - start_date
-    for i in range(delta_days.days + 1):
+    for i in range(delta_days.days):
         searched = 0
         search_date = start_date + timedelta(days = i)
         date_string = search_date.strftime("%Y-%m-%d")
+        search_date_until = start_date + timedelta(days = i+1)
+        search_date_until_string = search_date_until.strftime("%Y-%m-%d")
         if date_string in dates_to_skip:
             continue #Skip completed dates
         c.Since = date_string
-        search_date_until = start_date + timedelta(days = i+1)
-        c.Until = search_date_until.strftime("%Y-%m-%d")
+        c.Until = search_date_until_string
         c.Output = path + "/Bernard/bernie_tweets_{}.csv".format(date_string)
         while searched < 1:
             try:
@@ -144,15 +146,16 @@ def trumpSearch():
     today = date.today()
     start_date = date(2020,4,8) # RIP Bernard
     delta_days = today - start_date
-    for i in range(delta_days.days + 1):
+    for i in range(delta_days.days):
         searched = 0
         search_date = start_date + timedelta(days = i)
         date_string = search_date.strftime("%Y-%m-%d")
+        search_date_until = start_date + timedelta(days = i+1)
+        search_date_until_string = search_date_until.strftime("%Y-%m-%d")
         if date_string in dates_to_skip:
             continue #Skip completed dates
         c.Since = date_string
-        search_date_until = start_date + timedelta(days = i+1)
-        c.Until = search_date_until.strftime("%Y-%m-%d")
+        c.Until = search_date_until_string
         c.Output = path + "/Donald/trump_tweets_{}.csv".format(date_string)
         while searched < 1:
             try:
