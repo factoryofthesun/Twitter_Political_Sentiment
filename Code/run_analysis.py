@@ -32,6 +32,7 @@ def analyzeDay(date):
     outpath = str(Path(__file__).parent / "../Outputs")
     if os.path.exists(outpath + "/sentiment_records.csv"):
         records = pd.read_csv(outpath + "/sentiment_records.csv", index_col="Date")
+        #records.index = pd.to_datetime(records.index)
     else:
         records = pd.DataFrame(columns = ["Date", "Biden_Score", "Trump_Score"])
         records = records.set_index("Date")
@@ -70,6 +71,21 @@ def analyzeDay(date):
     plt.gcf().autofmt_xdate(rotation=25)
     plt.savefig(f"{plotpath}/{date}_sentiment_plot.png")
     plt.close()
+
+    # Generate word clouds
+    from wordcloud import WordCloud, STOPWORDS
+
+    biden_text = ' '.join(biden_sent_df['Tweet'].tolist())
+    trump_text = ' '.join(trump_sent_df['Tweet'].tolist())
+
+    stopwords = set(STOPWORDS)
+    stopwords.update(['twitter', 'com', 'https', 'www', 'say', 'going', 'pic', 'status'])
+    biden_cloud = WordCloud(background_color='white', collocations=False, stopwords=stopwords).generate(biden_text)
+    trump_cloud = WordCloud(background_color='white', collocations=False, stopwords=stopwords).generate(trump_text)
+
+    biden_cloud.to_file(f"{outpath}/Clouds/{date}_biden_cloud.png")
+    trump_cloud.to_file(f"{outpath}/Clouds/{date}_trump_cloud.png")
+
     return biden_score, trump_score
 if __name__ == "__main__":
     # Read the date from arguments

@@ -24,8 +24,11 @@ def makePost(biden_score, trump_score, msg, date):
 
     # Make post
     plotpath = str(Path(__file__).parent / "../Outputs/Plots")
+    cloudpath = str(Path(__file__).parent / "../Outputs/Clouds")
     img = api.media_upload(f"{plotpath}/{date}_sentiment_plot.png")
-    api.update_status(media_ids = [img.media_id_string], status = msg)
+    biden_cloud = api.media_upload(f"{cloudpath}/{date}_biden_cloud.png")
+    trump_cloud = api.media_upload(f"{cloudpath}/{date}_trump_cloud.png")
+    api.update_status(media_ids = [img.media_id_string, biden_cloud.media_id_string, trump_cloud.media_id_string], status = msg)
 
 if __name__ == "__main__":
     # Read the date from arguments

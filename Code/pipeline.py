@@ -20,6 +20,8 @@ yesterday_str = yesterday.strftime("%Y-%m-%d")
 bidenSearch(yesterday_str)
 trumpSearch(yesterday_str)
 biden_score, trump_score = analyzeDay(yesterday_str)
+biden_score = round(biden_score, 2)
+trump_score = round(trump_score, 2)
 
 msg = f"Twitter sentiment analysis for {yesterday_str}\nBiden score: {biden_score}\nTrump score: {trump_score}"
 

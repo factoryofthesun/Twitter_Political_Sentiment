@@ -15,6 +15,7 @@ def process_data(sr, subject_words):
     for i in range(len(sr)):
         redata = re.compile('|'.join(subject_words), re.IGNORECASE)
         masked_text = redata.sub('$T$', sr[i])
+        masked_text = re.sub(r'(\$T\$)\1+', r'\1', masked_text) # Remove consecutive masks
         tweets.extend([masked_text] * 3)
         for word in ["negative", "none", "positive"]:
             aux.append(f"the polarity of $T$ is {word}")

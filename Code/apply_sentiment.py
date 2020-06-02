@@ -45,6 +45,13 @@ def classifyDate(date):
     trump_tweets_df = pd.read_csv(path + f"/Donald/trump_tweets_{date}.csv")
     biden_tweets_df = pd.read_csv(path + f"/DiamondJoe/biden_tweets_{date}.csv")
 
+    # Supplement both dfs with tweets that mention both candidates
+    biden_including_trump = biden_tweets_df[biden_tweets_df['tweet'].str.contains('donald|trump',case=False)]
+    trump_including_biden = trump_tweets_df[trump_tweets_df['tweet'].str.contains('biden|joe',case=False)]
+
+    trump_tweets_df = trump_tweets_df.append(biden_including_trump, ignore_index=True).drop_duplicates().reset_index()
+    biden_tweets_df = biden_tweets_df.append(trump_including_biden, ignore_index=True).drop_duplicates().reset_index()
+
     trump_tweets = trump_tweets_df['tweet']
     trump_ids = trump_tweets_df['id']
     trump_likes = trump_tweets_df['likes_count']
